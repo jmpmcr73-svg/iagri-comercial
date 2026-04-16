@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/comercial", "destination": "/comercial.html" },
+    { "source": "/logistica", "destination": "/logistica.html" },
+    { "source": "/agricola", "destination": "/agricola.html" },
+    { "source": "/agroindustria", "destination": "/agroindustria.html" },
+    { "source": "/finanzas", "destination": "/finanzas.html" },
+    { "source": "/akasha", "destination": "/akasha.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Cache-Control", "value": "public, max-age=300, stale-while-revalidate=600" }
+      ]
+    }
+  ],
+  "env": {
+    "SUPABASE_URL": "https://crfghwtfqaplzsmwylxe.supabase.co",
+    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZmdod3RmcWFwbHpzbXd5bHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjc1MjksImV4cCI6MjA5MDkwMzUyOX0.WUNkTqU93H92nohb_Idqhu8nV1JblFvVRk6Lf_PJw64"
+  }
+}

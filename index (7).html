@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>iAGRI — Módulo Comercial</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  // Suppress Tailwind CDN production warning (not an error)
+  const _origWarn = console.warn.bind(console);
+  console.warn = (...a) => {
+    if (typeof a[0] === 'string' && a[0].includes('cdn.tailwindcss.com')) return;
+    _origWarn(...a);
+  };
+</script>
+<!-- Supabase UMD: exposes window.supabase — do NOT redeclare 'supabase' with const/let -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { font-family:'Inter',sans-serif; }
+  .brand { font-family:'Space Grotesk',sans-serif; }
+  .gradient-bg { background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 30%,#f0f9ff 70%,#eff6ff 100%); }
+  .card-shadow { box-shadow:0 4px 24px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04); }
+  .btn-login {
+    width:100%; padding:14px 20px; background:linear-gradient(135deg,#16a34a,#15803d);
+    color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:600;
+    cursor:pointer; transition:all .2s;
+  }
+  .btn-login:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(22,163,74,.3); }
+  .btn-login:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+  .form-input {
+    width:100%; padding:12px 16px; border:1.5px solid #e5e7eb; border-radius:12px;
+    font-size:15px; transition:border .2s; background:#fff; box-sizing:border-box;
+  }
+  .form-input:focus { outline:none; border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,.12); }
+</style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md">
+
+  <!-- Brand header -->
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl card-shadow mb-4">
+      <img id="logo-img"
+           src="https://crfghwtfqaplzsmwylxe.supabase.co/storage/v1/object/public/assets/iagri-logo.png"
+           class="w-14 h-14 object-contain" alt="iAGRI"
+           onerror="document.getElementById('logo-img').style.display='none';document.getElementById('logo-txt').style.display='flex'">
+      <div id="logo-txt" style="display:none" class="w-14 h-14 items-center justify-center">
+        <span class="brand text-3xl font-bold text-green-600">iA</span>
+      </div>
+    </div>
+    <h1 class="brand text-3xl font-bold text-gray-900">iAGRI</h1>
+    <p class="text-gray-500 mt-1 text-base">Ecosistema Comercial Inteligente</p>
+    <div class="flex items-center justify-center gap-2 mt-2">
+      <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+      <span class="text-xs text-green-600 font-semibold">Powered by Akasha AI</span>
+    </div>
+  </div>
+
+  <!-- Login card -->
+  <div class="bg-white rounded-3xl card-shadow p-8">
+    <h2 class="text-xl font-bold text-gray-900 mb-1">Bienvenido</h2>
+    <p class="text-gray-500 text-sm mb-6">Ingresa tus credenciales para continuar</p>
+
+    <div id="msg-err" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 mb-4 text-sm font-medium"></div>
+    <div id="msg-ok"  class="hidden bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 mb-4 text-sm font-medium"></div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Correo electrónico</label>
+        <input id="inp-email" type="email" class="form-input" placeholder="usuario@iagri.app" autocomplete="email">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
+        <input id="inp-pwd" type="password" class="form-input" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button id="btn-login" class="btn-login" onclick="doLogin()">
+        <span id="btn-label">Ingresar al Sistema</span>
+      </button>
+    </div>
+
+    <div class="mt-6 pt-5 border-t border-gray-100">
+      <p class="text-center text-xs text-gray-400 mb-3 uppercase tracking-wide font-semibold">Módulos disponibles</p>
+      <div class="grid grid-cols-4 gap-2">
+        <div class="text-center p-3 bg-green-50 rounded-xl border border-green-100">
+          <div class="text-xl">🏪</div><div class="text-xs text-green-700 mt-1 font-semibold">Comercial</div>
+        </div>
+        <div class="text-center p-3 bg-blue-50 rounded-xl border border-blue-100 opacity-50">
+          <div class="text-xl">🚛</div><div class="text-xs text-blue-700 mt-1 font-semibold">Logística</div>
+        </div>
+        <div class="text-center p-3 bg-amber-50 rounded-xl border border-amber-100 opacity-50">
+          <div class="text-xl">🌱</div><div class="text-xs text-amber-700 mt-1 font-semibold">Agrícola</div>
+        </div>
+        <div class="text-center p-3 bg-purple-50 rounded-xl border border-purple-100 opacity-50">
+          <div class="text-xl">🏭</div><div class="text-xs text-purple-700 mt-1 font-semibold">Agroind.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-center text-xs text-gray-400 mt-5">iAGRI Master OS — Project One SV © 2026 · v2.0</p>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  KEY FIX: The Supabase UMD bundle sets window.supabase.
+//  NEVER declare  `const supabase = ...`  (name already taken by UMD).
+//  Use `db` (or any other name) for the client instance.
+// ─────────────────────────────────────────────────────────────
+const SURL = 'https://crfghwtfqaplzsmwylxe.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZmdod3RmcWFwbHpzbXd5bHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjc1MjksImV4cCI6MjA5MDkwMzUyOX0.WUNkTqU93H92nohb_Idqhu8nV1JblFvVRk6Lf_PJw64';
+const db = window.supabase.createClient(SURL, SKEY); // ← 'db', not 'supabase'
+
+// Auto-redirect if session exists
+db.auth.getSession().then(({ data }) => {
+  if (data?.session) window.location.href = '/comercial.html';
+});
+
+async function doLogin() {
+  const email  = document.getElementById('inp-email').value.trim();
+  const pwd    = document.getElementById('inp-pwd').value;
+  const errEl  = document.getElementById('msg-err');
+  const okEl   = document.getElementById('msg-ok');
+  const btnEl  = document.getElementById('btn-login');
+  const lblEl  = document.getElementById('btn-label');
+
+  errEl.classList.add('hidden');
+  okEl.classList.add('hidden');
+
+  if (!email || !pwd) {
+    errEl.textContent = 'Por favor completa todos los campos.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  btnEl.disabled = true;
+  lblEl.textContent = 'Autenticando…';
+
+  const { error } = await db.auth.signInWithPassword({ email, password: pwd });
+
+  if (error) {
+    errEl.textContent = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+    errEl.classList.remove('hidden');
+    btnEl.disabled = false;
+    lblEl.textContent = 'Ingresar al Sistema';
+  } else {
+    okEl.textContent = '✓ Acceso concedido. Cargando módulo comercial…';
+    okEl.classList.remove('hidden');
+    setTimeout(() => { window.location.href = '/comercial.html'; }, 900);
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>
