@@ -53,6 +53,7 @@ tr:hover td{background:#fafafa;}
 .buser{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-radius:14px 0 14px 14px;padding:10px 14px;max-width:85%;font-size:13px;line-height:1.65;}
 /* Modal */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
+#m-obs{z-index:350;}  /* Obs modal always on top of lead/gantt/cnt modals */
 .mb{background:#fff;border-radius:20px;padding:2rem;width:95%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15);}
 /* Form */
 .fi{width:100%;padding:9px 13px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:13.5px;outline:none;transition:border .2s;background:#fff;}
@@ -367,6 +368,140 @@ label{font-size:12.5px;font-weight:600;color:#374151;display:block;margin-bottom
     <button onclick="hm('m-recurso')" style="padding:6px 10px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;">✕</button>
   </div>
   <div id="rec-body"></div>
+</div>
+</div>
+
+<!-- ══ MODAL PROVEEDOR 3PL ══ -->
+<div id="m-prov" class="ov" style="display:none;" onclick="if(event.target===this)hm('m-prov')">
+<div class="mb fa" style="max-width:660px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 id="prov-ttl" style="font-size:17px;font-weight:800;color:#111827;margin:0;">Proveedor Logístico (3PL)</h2>
+    <button onclick="hm('m-prov')" style="padding:6px 10px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;">✕</button>
+  </div>
+  <form id="f-prov" onsubmit="saveProv(event)">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="fgrp"><label>ID (auto si vacío)</label><input id="pv-id" class="fi" placeholder="3PL-XXX"></div>
+    <div class="fgrp"><label>Tipo 3PL</label>
+      <select id="pv-tipo" class="fi"><option>Integral 3PL</option><option>Transporte</option><option>Almacenaje</option><option>Distribución</option><option>Última milla</option></select></div>
+    <div class="fgrp"><label>Razón Social *</label><input id="pv-rs" class="fi" placeholder="Empresa S.A."></div>
+    <div class="fgrp"><label>Nombre Comercial *</label><input id="pv-nc" class="fi"></div>
+    <div class="fgrp"><label>País</label><select id="pv-pais" class="fi"><option>El Salvador</option><option>Guatemala</option><option>Honduras</option><option>Costa Rica</option></select></div>
+    <div class="fgrp"><label>Departamento</label><input id="pv-dep" class="fi"></div>
+    <div class="fgrp"><label>Municipio</label><input id="pv-mun" class="fi"></div>
+    <div class="fgrp"><label>Estado</label><select id="pv-est" class="fi"><option>Activo</option><option>Inactivo</option><option>En evaluación</option><option>Prospecto</option></select></div>
+    <div class="fgrp"><label>Cobertura Geográfica</label><input id="pv-cob" class="fi" placeholder="Nacional"></div>
+    <div class="fgrp"><label>Zonas Atendidas</label><input id="pv-zonas" class="fi" placeholder="Occidente, Centro, Oriente"></div>
+    <div class="fgrp"><label>Frecuencia Servicio</label><select id="pv-freq" class="fi"><option>Diario</option><option>Semanal</option><option>Variable</option></select></div>
+    <div class="fgrp"><label>Horario Operación</label><input id="pv-hor" class="fi" placeholder="6:00-18:00"></div>
+    <div class="fgrp"><label>Días Operación</label><input id="pv-dias" class="fi" placeholder="Lun-Sáb"></div>
+    <div class="fgrp"><label>Capacidad Diaria (entregas)</label><input type="number" id="pv-cap" class="fi" placeholder="100"></div>
+    <div class="fgrp"><label>Tipos de Unidades</label><input id="pv-uni" class="fi" placeholder="Camión, Refrigerado"></div>
+    <div class="fgrp"><label>Maneja Cadena Frío</label><select id="pv-frio" class="fi"><option value="true">Sí</option><option value="false">No</option></select></div>
+    <div class="fgrp"><label>SLA Objetivo</label><input id="pv-sla" class="fi" placeholder="95%"></div>
+    <div class="fgrp"><label>OTIF Histórico (%)</label><input type="number" id="pv-otif" class="fi" placeholder="93" step="0.1" min="0" max="100"></div>
+    <div class="fgrp"><label>Seguro de Carga</label><select id="pv-seg" class="fi"><option value="true">Sí</option><option value="false">No</option></select></div>
+    <div class="fgrp"><label>Clasificación</label><select id="pv-clas" class="fi"><option>Estratégico</option><option>Regular</option><option>Contingencia</option></select></div>
+    <div class="fgrp"><label>Riesgo Operativo</label><select id="pv-riesgo" class="fi"><option>Bajo</option><option>Medio</option><option>Alto</option></select></div>
+    <div class="fgrp"><label>Aprobado Hydroexpo</label><select id="pv-apr" class="fi"><option value="true">Sí</option><option value="false">No</option></select></div>
+    <div class="fgrp" style="grid-column:span 2;"><label>Dirección Fiscal</label><input id="pv-dir" class="fi"></div>
+    <div class="fgrp" style="grid-column:span 2;"><label>Observaciones</label><textarea id="pv-obs" class="fi" rows="2"></textarea></div>
+    <!-- Tarifa base -->
+    <div style="grid-column:span 2;"><div class="fsect">Tarifa & Condiciones</div></div>
+    <div class="fgrp"><label>Modelo Cobro</label><select id="pv-modelo" class="fi"><option>Por entrega</option><option>Por km</option><option>Por kg</option><option>Fijo mensual</option></select></div>
+    <div class="fgrp"><label>Tarifa Base (USD)</label><input type="number" id="pv-tarifa" class="fi" placeholder="0.00" step="0.01"></div>
+    <div class="fgrp"><label>Recargo Urgencia (USD)</label><input type="number" id="pv-rurg" class="fi" placeholder="0.00" step="0.01"></div>
+    <div class="fgrp"><label>Recargo Cadena Frío (USD)</label><input type="number" id="pv-rfrio" class="fi" placeholder="0.00" step="0.01"></div>
+    <div class="fgrp"><label>Plazo Pago (días)</label><input type="number" id="pv-plazo" class="fi" value="30"></div>
+    <div class="fgrp"><label>GPS Tiempo Real</label><select id="pv-gps" class="fi"><option value="true">Sí</option><option value="false">No</option></select></div>
+  </div>
+  <input type="hidden" id="pv-eid">
+  <div id="prov-err" class="err-msg" style="display:none;"></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid #f3f4f6;margin-top:12px;">
+    <button type="button" onclick="hm('m-prov')" class="btn btns">Cancelar</button>
+    <button type="submit" class="btn btng" id="prov-sbtn">✓ Guardar Proveedor</button>
+  </div>
+  </form>
+</div>
+</div>
+
+<!-- ══ MODAL VEHÍCULO ══ -->
+<div id="m-veh" class="ov" style="display:none;" onclick="if(event.target===this)hm('m-veh')">
+<div class="mb fa" style="max-width:580px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 id="veh-ttl" style="font-size:17px;font-weight:800;color:#111827;margin:0;">Vehículo</h2>
+    <button onclick="hm('m-veh')" style="padding:6px 10px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;">✕</button>
+  </div>
+  <form id="f-veh" onsubmit="saveVeh(event)">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="fgrp"><label>ID Vehículo (auto si vacío)</label><input id="vh-id" class="fi" placeholder="VEH-XXX"></div>
+    <div class="fgrp"><label>Placa *</label><input id="vh-placa" class="fi" placeholder="P 123-456"></div>
+    <div class="fgrp"><label>Marca</label><input id="vh-marca" class="fi" placeholder="Toyota"></div>
+    <div class="fgrp"><label>Modelo</label><input id="vh-modelo" class="fi" placeholder="Hilux"></div>
+    <div class="fgrp"><label>Año</label><input type="number" id="vh-anio" class="fi" placeholder="2022"></div>
+    <div class="fgrp"><label>Color</label><input id="vh-color" class="fi" placeholder="Blanco"></div>
+    <div class="fgrp"><label>Tipo</label><select id="vh-tipo" class="fi"><option>Camión</option><option>Pick-up</option><option>Refrigerado</option><option>Furgón</option><option>Moto</option><option>Van</option></select></div>
+    <div class="fgrp"><label>Estado</label><select id="vh-est" class="fi"><option>Activo</option><option>En Ruta</option><option>En Taller</option><option>Fuera de Servicio</option></select></div>
+    <div class="fgrp"><label>Capacidad KG</label><input type="number" id="vh-cap" class="fi" placeholder="1000" step="0.1"></div>
+    <div class="fgrp"><label>Capacidad m³</label><input type="number" id="vh-m3" class="fi" placeholder="5" step="0.1"></div>
+    <div class="fgrp"><label>Refrigerado</label><select id="vh-ref" class="fi"><option value="false">No</option><option value="true">Sí</option></select></div>
+    <div class="fgrp"><label>Temp. mín (°C)</label><input type="number" id="vh-tmin" class="fi" placeholder="-5" step="0.5"></div>
+    <div class="fgrp"><label>Km actuales</label><input type="number" id="vh-km" class="fi" placeholder="0"></div>
+    <div class="fgrp"><label>Próximo servicio (km)</label><input type="number" id="vh-kms" class="fi" placeholder="5000"></div>
+    <div class="fgrp"><label>Seguro vence</label><input type="date" id="vh-seg" class="fi"></div>
+    <div class="fgrp"><label>Revisión vence</label><input type="date" id="vh-rev" class="fi"></div>
+    <div class="fgrp" style="grid-column:span 2;"><label>GPS IMEI</label><input id="vh-gps" class="fi" placeholder="IMEI del dispositivo GPS"></div>
+  </div>
+  <input type="hidden" id="vh-eid">
+  <div id="veh-err" class="err-msg" style="display:none;"></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid #f3f4f6;margin-top:12px;">
+    <button type="button" onclick="hm('m-veh')" class="btn btns">Cancelar</button>
+    <button type="submit" class="btn btng" id="veh-sbtn">✓ Guardar Vehículo</button>
+  </div>
+  </form>
+</div>
+</div>
+
+<!-- ══ MODAL CHOFER / AYUDANTE ══ -->
+<div id="m-chof" class="ov" style="display:none;" onclick="if(event.target===this)hm('m-chof')">
+<div class="mb fa" style="max-width:600px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 id="chof-ttl" style="font-size:17px;font-weight:800;color:#111827;margin:0;">Chofer / Ayudante</h2>
+    <button onclick="hm('m-chof')" style="padding:6px 10px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;">✕</button>
+  </div>
+  <form id="f-chof" onsubmit="saveChof(event)">
+  <!-- Selector de rol -->
+  <div style="display:flex;gap:8px;background:#f3f4f6;border-radius:10px;padding:4px;margin-bottom:14px;width:fit-content;">
+    <button type="button" onclick="setRolChof('chofer',this)" id="rol-chof-btn" style="padding:7px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#16a34a;box-shadow:0 1px 4px rgba(0,0,0,.08);">👤 Chofer</button>
+    <button type="button" onclick="setRolChof('ayudante',this)" id="rol-ayu-btn" style="padding:7px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">🧑‍🤝‍🧑 Ayudante</button>
+  </div>
+  <input type="hidden" id="chof-rol" value="chofer">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="fgrp"><label>Nombre *</label><input id="chof-nom" class="fi"></div>
+    <div class="fgrp"><label>Apellido *</label><input id="chof-ape" class="fi"></div>
+    <div class="fgrp"><label>DUI</label><input id="chof-dui" class="fi" placeholder="00000000-0"></div>
+    <div class="fgrp"><label>Teléfono</label><input id="chof-tel" class="fi"></div>
+    <div class="fgrp"><label>WhatsApp</label><input id="chof-wa" class="fi"></div>
+    <div class="fgrp"><label>Correo</label><input id="chof-email" class="fi" type="email"></div>
+    <!-- Solo para choferes -->
+    <div id="chof-lic-sec" class="fgrp"><label>Número de Licencia</label><input id="chof-lic" class="fi"></div>
+    <div id="chof-lict-sec" class="fgrp"><label>Tipo de Licencia</label><select id="chof-lict" class="fi"><option>Liviana</option><option>Pesada</option><option>Motocicleta</option><option>Mixta</option></select></div>
+    <div id="chof-licv-sec" class="fgrp"><label>Licencia vence</label><input type="date" id="chof-licv" class="fi"></div>
+    <div class="fgrp"><label>Zona asignada</label><input id="chof-zona" class="fi" placeholder="Centro, Sur…"></div>
+    <div class="fgrp"><label>Vehículo asignado</label>
+      <select id="chof-veh" class="fi">
+        <option value="">Sin asignar</option>
+      </select></div>
+    <div class="fgrp"><label>Estado</label><select id="chof-est" class="fi"><option>Activo</option><option>Inactivo</option><option>Vacaciones</option><option>Suspendido</option></select></div>
+    <div class="fgrp"><label>Fecha Ingreso</label><input type="date" id="chof-ing" class="fi"></div>
+    <div class="fgrp"><label>Fecha Nacimiento</label><input type="date" id="chof-nac" class="fi"></div>
+  </div>
+  <input type="hidden" id="chof-eid">
+  <div id="chof-err" class="err-msg" style="display:none;"></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid #f3f4f6;margin-top:12px;">
+    <button type="button" onclick="hm('m-chof')" class="btn btns">Cancelar</button>
+    <button type="submit" class="btn btng" id="chof-sbtn">✓ Guardar</button>
+  </div>
+  </form>
 </div>
 </div>
 
@@ -910,7 +1045,7 @@ function renderProv(){
   return `<div class="card" style="overflow:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
     <h3 style="font-weight:700;font-size:14px;color:#111827;margin:0;">Proveedores Logísticos (3PL)</h3>
-    <button class="btn btng" style="padding:7px 14px;font-size:12.5px;" onclick="toast('Formulario nuevo proveedor — próximamente','info')">+ Nuevo Proveedor</button>
+    <button class="btn btng" style="padding:7px 14px;font-size:12.5px;" onclick="openProvM()">+ Nuevo Proveedor</button>
   </div>
   <table><thead><tr><th>Empresa</th><th>Tipo</th><th>Zonas</th><th>Cap. diaria</th><th>Frío</th><th>OTIF</th><th>Tarifa base</th><th>Estado</th><th>Acciones</th></tr></thead>
   <tbody>${TL.length===0?`<tr><td colspan="9" style="text-align:center;color:#9ca3af;padding:16px;">Sin proveedores 3PL registrados</td></tr>`:
@@ -927,7 +1062,7 @@ function renderProv(){
     <td>$${tarifa?.tarifa_base||'—'}</td>
     <td><span class="badge ${t.estado==='Activo'?'bg':'bgr'}">${t.estado||'—'}</span></td>
     <td><div style="display:flex;gap:5px;">
-      <button style="font-size:11px;padding:4px 8px;background:#dbeafe;color:#1d4ed8;border:none;border-radius:6px;cursor:pointer;" onclick="toast('Editar proveedor — próximamente','info')">✏️</button>
+      <button style="font-size:11px;padding:4px 8px;background:#dbeafe;color:#1d4ed8;border:none;border-radius:6px;cursor:pointer;font-weight:600;" onclick="openProvM('${t.tercero_id}')">✏️ Editar</button>
       <button style="font-size:11px;padding:4px 8px;background:#fef3c7;color:#b45309;border:none;border-radius:6px;cursor:pointer;" onclick="contactarProveedor('${t.nombre_comercial}')">💬 WA</button>
     </div></td>
   </tr>`}).join('')}
@@ -980,9 +1115,12 @@ function renderRutas(){
 
 function renderVeh(){
   return `<div class="card" style="overflow:auto;">
-  <h3 style="font-weight:700;font-size:14px;color:#111827;margin:0 0 12px;">Flota de Vehículos</h3>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h3 style="font-weight:700;font-size:14px;color:#111827;margin:0;">Flota de Vehículos</h3>
+    <button class="btn btng" style="padding:7px 14px;font-size:12.5px;" onclick="openVehM()">+ Nuevo Vehículo</button>
+  </div>
   <table><thead><tr><th>Vehículo</th><th>Placa</th><th>Capacidad</th><th>Tipo</th><th>Refrigerado</th><th>Km actuales</th><th>Próx. servicio</th><th>Seguro vence</th><th>Estado</th><th>Acciones</th></tr></thead>
-  <tbody>${VEH.length===0?`<tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:16px;">Sin vehículos</td></tr>`:
+  <tbody>${VEH.length===0?`<tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:16px;">Sin vehículos registrados</td></tr>`:
   VEH.map(v=>`<tr>
     <td><div style="font-weight:600;">${v.marca||''} ${v.modelo||''} ${v.anio||''}</div></td>
     <td style="font-family:monospace;font-weight:700;">${v.placa}</td>
@@ -993,7 +1131,10 @@ function renderVeh(){
     <td style="font-size:12px;${v.proximo_servicio_km&&v.km_actuales&&(v.proximo_servicio_km-v.km_actuales)<1000?'color:#dc2626;font-weight:700;':''}">${v.proximo_servicio_km?Number(v.proximo_servicio_km).toLocaleString()+' km':'—'}</td>
     <td style="font-size:12px;">${v.seguro_vence||'—'}</td>
     <td><span class="badge ${v.estado==='Activo'?'bg':v.estado==='En Ruta'?'ba':'bgr'}">${v.estado||'—'}</span></td>
-    <td><button style="font-size:11px;padding:4px 8px;background:#dbeafe;color:#1d4ed8;border:none;border-radius:6px;cursor:pointer;" onclick="showRecurso('vehiculo','${v.vehiculo_id}')">✏️</button></td>
+    <td><div style="display:flex;gap:4px;">
+      <button style="font-size:11px;padding:4px 8px;background:#dbeafe;color:#1d4ed8;border:none;border-radius:6px;cursor:pointer;font-weight:600;" onclick="openVehM('${v.vehiculo_id}')">✏️ Editar</button>
+      <button style="font-size:11px;padding:4px 8px;background:#fef3c7;color:#b45309;border:none;border-radius:6px;cursor:pointer;" onclick="urgenciaRecurso('vehiculo','${v.vehiculo_id}')">⚠️</button>
+    </div></td>
   </tr>`).join('')}
   </tbody></table>
   </div>`;
@@ -1001,23 +1142,29 @@ function renderVeh(){
 
 function renderChof(){
   return `<div class="card" style="overflow:auto;">
-  <h3 style="font-weight:700;font-size:14px;color:#111827;margin:0 0 12px;">Choferes & Ayudantes</h3>
-  <table><thead><tr><th>Nombre</th><th>DUI</th><th>Licencia</th><th>Tipo</th><th>Vence</th><th>Teléfono</th><th>Zona asignada</th><th>Estado</th><th>Acciones</th></tr></thead>
-  <tbody>${CHO.length===0?`<tr><td colspan="9" style="text-align:center;color:#9ca3af;padding:16px;">Sin choferes</td></tr>`:
-  CHO.map(c=>`<tr>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h3 style="font-weight:700;font-size:14px;color:#111827;margin:0;">Choferes & Ayudantes</h3>
+    <button class="btn btng" style="padding:7px 14px;font-size:12.5px;" onclick="openChofM()">+ Nuevo Chofer/Ayudante</button>
+  </div>
+  <table><thead><tr><th>Rol</th><th>Nombre</th><th>DUI</th><th>Licencia</th><th>Vence</th><th>WhatsApp</th><th>Vehículo</th><th>Zona</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>${CHO.length===0?`<tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:16px;">Sin choferes/ayudantes registrados</td></tr>`:
+  CHO.map(c=>{
+    const veh=VEH.find(v=>v.vehiculo_id===c.vehiculo_id);
+    return `<tr>
+    <td><span class="badge bgr" style="font-size:10px;">${c.licencia_num?'Chofer':'Ayudante'}</span></td>
     <td style="font-weight:600;">${c.nombre} ${c.apellido}</td>
     <td style="font-family:monospace;font-size:12px;">${c.dui||'—'}</td>
     <td style="font-family:monospace;font-size:12px;">${c.licencia_num||'—'}</td>
-    <td><span class="badge bgr">${c.licencia_tipo||'—'}</span></td>
     <td style="font-size:12px;${c.licencia_vence&&new Date(c.licencia_vence)<new Date()?'color:#dc2626;font-weight:700;':''}">${c.licencia_vence||'—'}</td>
     <td style="font-size:12px;">${c.whatsapp||c.telefono||'—'}</td>
+    <td style="font-size:12px;">${veh?veh.placa:'—'}</td>
     <td>${c.zona_asignada||'—'}</td>
     <td><span class="badge ${c.estado==='Activo'?'bg':'bgr'}">${c.estado||'—'}</span></td>
     <td><div style="display:flex;gap:4px;">
-      <button style="font-size:11px;padding:4px 8px;background:#dbeafe;color:#1d4ed8;border:none;border-radius:6px;cursor:pointer;" onclick="showRecurso('chofer','${c.chofer_id}')">✏️</button>
-      ${c.whatsapp?`<button style="font-size:11px;padding:4px 8px;background:#dcfce7;color:#15803d;border:none;border-radius:6px;cursor:pointer;" onclick="openWA('','+${c.whatsapp.replace(/\D/g,'')}')">💬</button>`:''}
+      <button style="font-size:11px;padding:4px 8px;background:#dbeafe;color:#1d4ed8;border:none;border-radius:6px;cursor:pointer;font-weight:600;" onclick="openChofM('${c.chofer_id}')">✏️ Editar</button>
+      ${c.whatsapp?`<button style="font-size:11px;padding:4px 8px;background:#dcfce7;color:#15803d;border:none;border-radius:6px;cursor:pointer;" onclick="openWA('Hola ${c.nombre}','+${c.whatsapp.replace(/\D/g,'')}')">💬</button>`:''}
     </div></td>
-  </tr>`).join('')}
+  </tr>`;}).join('')}
   </tbody></table>
   </div>`;
 }
@@ -1536,6 +1683,285 @@ function urgenciaRecurso(tipo,id){
     await loadAll();
     toast(`✅ Incidencia de ${tipo} registrada en auditoría`,'ok'); return true;
   });
+}
+
+// ──────────────────────────────────────────────
+//  CRUD PROVEEDOR 3PL
+// ──────────────────────────────────────────────
+function openProvM(id=''){
+  document.getElementById('prov-ttl').textContent=id?'Editar Proveedor 3PL':'Nuevo Proveedor Logístico (3PL)';
+  document.getElementById('prov-sbtn').textContent=id?'✓ Actualizar':'✓ Guardar Proveedor';
+  document.getElementById('pv-eid').value=id;
+  document.getElementById('prov-err').style.display='none';
+  ['pv-id','pv-rs','pv-nc','pv-dep','pv-mun','pv-cob','pv-zonas','pv-hor','pv-dias','pv-cap',
+   'pv-uni','pv-sla','pv-otif','pv-dir','pv-obs','pv-tarifa','pv-rurg','pv-rfrio','pv-plazo'].forEach(fid=>{
+    const e=document.getElementById(fid);if(e)e.value='';
+  });
+  document.getElementById('pv-plazo').value=30;
+  if(id){
+    const t=TL.find(x=>x.tercero_id===id);
+    if(!t){toast('Proveedor no encontrado en memoria','err');return;}
+    document.getElementById('pv-id').value=t.tercero_id||'';
+    document.getElementById('pv-tipo').value=t.tipo_3pl||'Integral 3PL';
+    document.getElementById('pv-rs').value=t.razon_social||'';
+    document.getElementById('pv-nc').value=t.nombre_comercial||'';
+    document.getElementById('pv-pais').value=t.pais||'El Salvador';
+    document.getElementById('pv-dep').value=t.departamento||'';
+    document.getElementById('pv-mun').value=t.municipio||'';
+    document.getElementById('pv-est').value=t.estado||'Activo';
+    document.getElementById('pv-cob').value=t.cobertura_geografica||'';
+    document.getElementById('pv-zonas').value=t.zonas_atendidas||'';
+    document.getElementById('pv-freq').value=t.frecuencia_servicio||'Diario';
+    document.getElementById('pv-hor').value=t.horario_operacion||'';
+    document.getElementById('pv-dias').value=t.dias_operacion||'';
+    document.getElementById('pv-cap').value=t.capacidad_diaria||'';
+    document.getElementById('pv-uni').value=t.tipos_unidades||'';
+    document.getElementById('pv-frio').value=t.maneja_cadena_fria?'true':'false';
+    document.getElementById('pv-sla').value=t.sla_objetivo||'';
+    document.getElementById('pv-otif').value=t.otif_historico?Math.round(t.otif_historico*100):'';
+    document.getElementById('pv-seg').value=t.seguro_carga?'true':'false';
+    document.getElementById('pv-clas').value=t.clasificacion||'Estratégico';
+    document.getElementById('pv-riesgo').value=t.riesgo_operativo||'Medio';
+    document.getElementById('pv-apr').value=t.aprobado_hydroexpo?'true':'false';
+    document.getElementById('pv-dir').value=t.direccion_fiscal||'';
+    document.getElementById('pv-obs').value=t.observaciones||'';
+    // Load tarifa
+    const tar=logistica_tarifas_data.find(x=>x.tercero_id===id);
+    if(tar){
+      document.getElementById('pv-modelo').value=tar.modelo_cobro||'Por entrega';
+      document.getElementById('pv-tarifa').value=tar.tarifa_base||0;
+      document.getElementById('pv-rurg').value=tar.recargo_urgencia||0;
+      document.getElementById('pv-rfrio').value=tar.recargo_cadena_fria||0;
+      document.getElementById('pv-plazo').value=tar.plazo_pago_dias||30;
+      document.getElementById('pv-gps').value=tar.gps_tiempo_real?'true':'false';
+    }
+  }
+  sm('m-prov');
+}
+
+async function saveProv(e){
+  e.preventDefault();
+  const errEl=document.getElementById('prov-err');errEl.style.display='none';
+  const editId=document.getElementById('pv-eid').value;
+  const rs=document.getElementById('pv-rs').value.trim();
+  const nc=document.getElementById('pv-nc').value.trim();
+  if(!rs){errEl.textContent='⚠️ Razón Social obligatoria';errEl.style.display='block';return;}
+  const sbBtn=document.getElementById('prov-sbtn');sbBtn.disabled=true;sbBtn.textContent='Guardando…';
+  const rand=String(Math.floor(Math.random()*999)+1).padStart(3,'0');
+  const newId=document.getElementById('pv-id').value.trim()||`3PL-${rand}`;
+  const payload={
+    tercero_id:editId||newId, razon_social:rs, nombre_comercial:nc,
+    tipo_3pl:document.getElementById('pv-tipo').value,
+    pais:document.getElementById('pv-pais').value,
+    departamento:document.getElementById('pv-dep').value,
+    municipio:document.getElementById('pv-mun').value,
+    estado:document.getElementById('pv-est').value,
+    cobertura_geografica:document.getElementById('pv-cob').value,
+    zonas_atendidas:document.getElementById('pv-zonas').value,
+    frecuencia_servicio:document.getElementById('pv-freq').value,
+    horario_operacion:document.getElementById('pv-hor').value,
+    dias_operacion:document.getElementById('pv-dias').value,
+    capacidad_diaria:parseFloat(document.getElementById('pv-cap').value)||null,
+    tipos_unidades:document.getElementById('pv-uni').value,
+    maneja_cadena_fria:document.getElementById('pv-frio').value==='true',
+    sla_objetivo:document.getElementById('pv-sla').value,
+    otif_historico:document.getElementById('pv-otif').value?parseFloat(document.getElementById('pv-otif').value)/100:null,
+    seguro_carga:document.getElementById('pv-seg').value==='true',
+    clasificacion:document.getElementById('pv-clas').value,
+    riesgo_operativo:document.getElementById('pv-riesgo').value,
+    aprobado_hydroexpo:document.getElementById('pv-apr').value==='true',
+    direccion_fiscal:document.getElementById('pv-dir').value,
+    observaciones:document.getElementById('pv-obs').value,
+    tenant_id:'hidroexpo',
+  };
+  const {error}=editId
+    ?await db.from('comercial_terceros_logisticos').update(payload).eq('tercero_id',editId)
+    :await db.from('comercial_terceros_logisticos').insert(payload);
+  if(error){errEl.textContent='❌ '+error.message;errEl.style.display='block';sbBtn.disabled=false;sbBtn.textContent='✓ Guardar Proveedor';return;}
+  // Save/update tarifa
+  const tarifaPayload={
+    tercero_id:editId||newId,
+    modelo_cobro:document.getElementById('pv-modelo').value,
+    tarifa_base:parseFloat(document.getElementById('pv-tarifa').value)||0,
+    recargo_urgencia:parseFloat(document.getElementById('pv-rurg').value)||0,
+    recargo_cadena_fria:parseFloat(document.getElementById('pv-rfrio').value)||0,
+    plazo_pago_dias:parseInt(document.getElementById('pv-plazo').value)||30,
+    gps_tiempo_real:document.getElementById('pv-gps').value==='true',
+    moneda:'USD', forma_pago:'Transferencia', tenant_id:'hidroexpo',
+  };
+  const existeTarifa=logistica_tarifas_data.find(x=>x.tercero_id===(editId||newId));
+  if(existeTarifa)await db.from('logistica_tarifas').update(tarifaPayload).eq('tercero_id',editId||newId);
+  else await db.from('logistica_tarifas').insert(tarifaPayload);
+  // Auditoría
+  await db.from('logistica_auditoria').insert({entidad:'proveedor_3pl',entidad_id:editId||newId,accion:editId?'Proveedor actualizado':'Proveedor creado',notas:nc,usuario:me?.email});
+  sbBtn.disabled=false;sbBtn.textContent='✓ Guardar Proveedor';
+  hm('m-prov');await loadAll();
+  // Refresh la pestaña proveedores si estamos en logística
+  if(currentSection==='log'){const t=document.getElementById('log-tab-0');if(t)t.innerHTML=renderProv();}
+  toast(`✅ Proveedor ${nc} ${editId?'actualizado':'guardado'}`,'ok');
+}
+
+// ──────────────────────────────────────────────
+//  CRUD VEHÍCULO
+// ──────────────────────────────────────────────
+function openVehM(id=''){
+  document.getElementById('veh-ttl').textContent=id?'Editar Vehículo':'Nuevo Vehículo';
+  document.getElementById('veh-sbtn').textContent=id?'✓ Actualizar':'✓ Guardar Vehículo';
+  document.getElementById('vh-eid').value=id;
+  document.getElementById('veh-err').style.display='none';
+  ['vh-id','vh-placa','vh-marca','vh-modelo','vh-anio','vh-color','vh-cap','vh-m3','vh-tmin','vh-km','vh-kms','vh-gps'].forEach(fid=>{const e=document.getElementById(fid);if(e)e.value='';});
+  ['vh-seg','vh-rev'].forEach(fid=>{const e=document.getElementById(fid);if(e)e.value='';});
+  // Fill vehículo selector in chofer form
+  const vSel=document.getElementById('chof-veh');
+  if(vSel){vSel.innerHTML='<option value="">Sin asignar</option>'+VEH.map(v=>`<option value="${v.vehiculo_id}">${v.placa} ${v.marca||''} ${v.modelo||''}</option>`).join('');}
+  if(id){
+    const v=VEH.find(x=>x.vehiculo_id===id);
+    if(!v){toast('Vehículo no encontrado','err');return;}
+    document.getElementById('vh-id').value=v.vehiculo_id||'';
+    document.getElementById('vh-placa').value=v.placa||'';
+    document.getElementById('vh-marca').value=v.marca||'';
+    document.getElementById('vh-modelo').value=v.modelo||'';
+    document.getElementById('vh-anio').value=v.anio||'';
+    document.getElementById('vh-color').value=v.color||'';
+    document.getElementById('vh-tipo').value=v.tipo||'Camión';
+    document.getElementById('vh-est').value=v.estado||'Activo';
+    document.getElementById('vh-cap').value=v.capacidad_kg||'';
+    document.getElementById('vh-m3').value=v.capacidad_m3||'';
+    document.getElementById('vh-ref').value=v.refrigerado?'true':'false';
+    document.getElementById('vh-tmin').value=v.temp_min||'';
+    document.getElementById('vh-km').value=v.km_actuales||'';
+    document.getElementById('vh-kms').value=v.proximo_servicio_km||'';
+    document.getElementById('vh-seg').value=v.seguro_vence||'';
+    document.getElementById('vh-rev').value=v.revision_vence||'';
+    document.getElementById('vh-gps').value=v.gps_imei||'';
+  }
+  sm('m-veh');
+}
+
+async function saveVeh(e){
+  e.preventDefault();
+  const errEl=document.getElementById('veh-err');errEl.style.display='none';
+  const editId=document.getElementById('vh-eid').value;
+  const placa=document.getElementById('vh-placa').value.trim();
+  if(!placa){errEl.textContent='⚠️ Placa obligatoria';errEl.style.display='block';return;}
+  const sbBtn=document.getElementById('veh-sbtn');sbBtn.disabled=true;sbBtn.textContent='Guardando…';
+  const rand=String(Math.floor(Math.random()*999)+1).padStart(3,'0');
+  const newId=document.getElementById('vh-id').value.trim()||`VEH-${rand}`;
+  const payload={
+    vehiculo_id:editId||newId, placa,
+    marca:document.getElementById('vh-marca').value,
+    modelo:document.getElementById('vh-modelo').value,
+    anio:parseInt(document.getElementById('vh-anio').value)||null,
+    color:document.getElementById('vh-color').value,
+    tipo:document.getElementById('vh-tipo').value,
+    estado:document.getElementById('vh-est').value,
+    capacidad_kg:parseFloat(document.getElementById('vh-cap').value)||null,
+    capacidad_m3:parseFloat(document.getElementById('vh-m3').value)||null,
+    refrigerado:document.getElementById('vh-ref').value==='true',
+    temp_min:parseFloat(document.getElementById('vh-tmin').value)||null,
+    km_actuales:parseInt(document.getElementById('vh-km').value)||0,
+    proximo_servicio_km:parseInt(document.getElementById('vh-kms').value)||null,
+    seguro_vence:document.getElementById('vh-seg').value||null,
+    revision_vence:document.getElementById('vh-rev').value||null,
+    gps_imei:document.getElementById('vh-gps').value,
+    tenant_id:'hidroexpo',
+  };
+  const {error}=editId
+    ?await db.from('logistica_vehiculos').update(payload).eq('vehiculo_id',editId)
+    :await db.from('logistica_vehiculos').insert(payload);
+  sbBtn.disabled=false;sbBtn.textContent='✓ Guardar Vehículo';
+  if(error){errEl.textContent='❌ '+error.message;errEl.style.display='block';return;}
+  await db.from('logistica_auditoria').insert({entidad:'vehiculo',entidad_id:editId||newId,accion:editId?'Vehículo actualizado':'Vehículo creado',notas:`Placa: ${placa}`,usuario:me?.email});
+  hm('m-veh');await loadAll();
+  if(currentSection==='log'){const t=document.getElementById('log-tab-2');if(t)t.innerHTML=renderVeh();}
+  toast(`✅ Vehículo ${placa} ${editId?'actualizado':'guardado'}`,'ok');
+}
+
+// ──────────────────────────────────────────────
+//  CRUD CHOFER / AYUDANTE
+// ──────────────────────────────────────────────
+function setRolChof(rol,btn){
+  document.getElementById('chof-rol').value=rol;
+  document.getElementById('rol-chof-btn').style.background=rol==='chofer'?'#fff':'transparent';
+  document.getElementById('rol-chof-btn').style.color=rol==='chofer'?'#16a34a':'#6b7280';
+  document.getElementById('rol-ayu-btn').style.background=rol==='ayudante'?'#fff':'transparent';
+  document.getElementById('rol-ayu-btn').style.color=rol==='ayudante'?'#16a34a':'#6b7280';
+  // Show/hide license fields for chofer only
+  ['chof-lic-sec','chof-lict-sec','chof-licv-sec'].forEach(id2=>{
+    const el=document.getElementById(id2);if(el)el.style.display=rol==='chofer'?'flex':'none';
+  });
+}
+
+function openChofM(id=''){
+  document.getElementById('chof-ttl').textContent=id?'Editar Chofer/Ayudante':'Nuevo Chofer / Ayudante';
+  document.getElementById('chof-sbtn').textContent=id?'✓ Actualizar':'✓ Guardar';
+  document.getElementById('chof-eid').value=id;
+  document.getElementById('chof-err').style.display='none';
+  setRolChof('chofer',null);
+  ['chof-nom','chof-ape','chof-dui','chof-tel','chof-wa','chof-email','chof-lic','chof-zona'].forEach(fid=>{const e=document.getElementById(fid);if(e)e.value='';});
+  ['chof-licv','chof-ing','chof-nac'].forEach(fid=>{const e=document.getElementById(fid);if(e)e.value='';});
+  // Fill vehicle dropdown
+  const vSel=document.getElementById('chof-veh');
+  if(vSel)vSel.innerHTML='<option value="">Sin asignar</option>'+VEH.map(v=>`<option value="${v.vehiculo_id}">${v.placa} ${v.marca||''} ${v.modelo||''}</option>`).join('');
+  if(id){
+    const c=CHO.find(x=>x.chofer_id===id);
+    if(!c){toast('Chofer no encontrado','err');return;}
+    document.getElementById('chof-nom').value=c.nombre||'';
+    document.getElementById('chof-ape').value=c.apellido||'';
+    document.getElementById('chof-dui').value=c.dui||'';
+    document.getElementById('chof-tel').value=c.telefono||'';
+    document.getElementById('chof-wa').value=c.whatsapp||'';
+    document.getElementById('chof-email').value=c.correo||'';
+    document.getElementById('chof-lic').value=c.licencia_num||'';
+    document.getElementById('chof-lict').value=c.licencia_tipo||'Liviana';
+    document.getElementById('chof-licv').value=c.licencia_vence||'';
+    document.getElementById('chof-zona').value=c.zona_asignada||'';
+    document.getElementById('chof-veh').value=c.vehiculo_id||'';
+    document.getElementById('chof-est').value=c.estado||'Activo';
+    document.getElementById('chof-ing').value=c.fecha_ingreso||'';
+    if(!c.licencia_num)setRolChof('ayudante',null);
+  }
+  sm('m-chof');
+}
+
+async function saveChof(e){
+  e.preventDefault();
+  const errEl=document.getElementById('chof-err');errEl.style.display='none';
+  const editId=document.getElementById('chof-eid').value;
+  const nom=document.getElementById('chof-nom').value.trim();
+  const ape=document.getElementById('chof-ape').value.trim();
+  if(!nom||!ape){errEl.textContent='⚠️ Nombre y Apellido obligatorios';errEl.style.display='block';return;}
+  const sbBtn=document.getElementById('chof-sbtn');sbBtn.disabled=true;sbBtn.textContent='Guardando…';
+  const rand=String(Math.floor(Math.random()*999)+1).padStart(3,'0');
+  const rol=document.getElementById('chof-rol').value;
+  const newId=`CHO-${rand}`;
+  const payload={
+    chofer_id:editId||newId,
+    nombre:nom, apellido:ape,
+    dui:document.getElementById('chof-dui').value,
+    telefono:document.getElementById('chof-tel').value,
+    whatsapp:document.getElementById('chof-wa').value,
+    correo:document.getElementById('chof-email').value,
+    zona_asignada:document.getElementById('chof-zona').value,
+    vehiculo_id:document.getElementById('chof-veh').value||null,
+    estado:document.getElementById('chof-est').value,
+    fecha_ingreso:document.getElementById('chof-ing').value||null,
+    tenant_id:'hidroexpo',
+  };
+  if(rol==='chofer'){
+    payload.licencia_num=document.getElementById('chof-lic').value;
+    payload.licencia_tipo=document.getElementById('chof-lict').value;
+    payload.licencia_vence=document.getElementById('chof-licv').value||null;
+  }
+  const {error}=editId
+    ?await db.from('logistica_choferes').update(payload).eq('chofer_id',editId)
+    :await db.from('logistica_choferes').insert(payload);
+  sbBtn.disabled=false;sbBtn.textContent='✓ Guardar';
+  if(error){errEl.textContent='❌ '+error.message;errEl.style.display='block';return;}
+  await db.from('logistica_auditoria').insert({entidad:'chofer',entidad_id:editId||newId,accion:editId?`${rol} actualizado`:`${rol} creado`,notas:`${nom} ${ape}`,usuario:me?.email});
+  hm('m-chof');await loadAll();
+  if(currentSection==='log'){const t=document.getElementById('log-tab-3');if(t)t.innerHTML=renderChof();}
+  toast(`✅ ${rol==='ayudante'?'Ayudante':'Chofer'} ${nom} ${ape} ${editId?'actualizado':'registrado'}`,'ok');
 }
 
 function contactarProveedor(nombre){
